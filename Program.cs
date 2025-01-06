@@ -1,6 +1,12 @@
+using LiftTrackerAPI.Types;
+using LiftTrackerAPI.Services;
+
 var builder = WebApplication.CreateBuilder(args);
 
-builder.AddGraphQL().AddTypes();
+builder.Services
+    .AddScoped<IDataService, DataService>()
+    .AddGraphQL()
+    .AddTypes();
 
 var app = builder.Build();
 
