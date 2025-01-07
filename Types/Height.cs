@@ -13,17 +13,3 @@ public class Height
     public HeightUnit Unit { get; set; }
     
 }
-
-public class HeightType : ObjectType<Height>
-{
-    protected override void Configure(IObjectTypeDescriptor<Height> descriptor)
-    {
-        descriptor
-            .Field(f => f.Val)
-            .Type<IntType>();
-
-        descriptor
-            .Field(f => f.Unit)
-            .Type<EnumType>();
-    }
-}

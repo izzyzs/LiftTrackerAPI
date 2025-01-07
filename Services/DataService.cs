@@ -2,17 +2,20 @@ namespace LiftTrackerAPI.Services;
 
 using LiftTrackerAPI.Types;
 using LiftTrackerAPI.Data;
+using System.Linq;
 using SQLitePCL;
 using Yarp.ReverseProxy.Forwarder;
 
 public interface IDataService
 {
-    Task<User> GetUserAsync(int id);
-    Task<Height> GetHeightAsync(int id);
-    Task<Weight> GetWeightAsync(int id);
-    Task<IEnumerable<Lift>> GetLiftsAsync(int id);
-    Task <Lift> GetLiftByNameAsync(int id, string name);
+    User? GetUser(int id);
+    IEnumerable<Lift>? GetLifts(int id);
+    Lift? GetLiftByName(int id, string name);
 }
+
+    // Task<Height> GetHeightAsync(int id);
+    // Task<Weight> GetWeightAsync(int id);
+    // Task<IEnumerable<Lift>> GetLiftsAsync(int id);
 
 public class DataService : IDataService
 {
@@ -21,13 +24,41 @@ public class DataService : IDataService
     {
         _context = context;
     }
-    public async Task<User> GetUserAsync(int id)
+    public User? GetUser(int id)
     {
-        var user = await _context.Users.FindAsync(id);
+        var user = _context.Users.Find(id);
         return user;
     }
 
-    public async Task<Height> GetHeightAsync(int id)
+    public IEnumerable<Lift>? GetLifts(int id)
+    {
+        User? user = _context.Users.Find(id);
+        if (user == null)
+        {
+            return null;
+        }
+
+        var lifts = user.Lifts;
+        return [.. lifts];
+    }
+
+    public Lift? GetLiftByName(int id, string name)
+    {
+        User? user = _context.Users.Find(id);
+        if (user == null) {
+            return null;
+        }
+
+        Lift? lift = user.Lifts.FirstOrDefault(l => l.Name == name);
+        if (lift == null) {
+            return null;
+        }
+        return lift;
+    }
+}
+
+/*
+public async Task<Height> GetHeightAsync(int id)
     {
         var user =  await _context.Users.FindAsync(id);
         Height height = user.UserHeight;
@@ -41,22 +72,11 @@ public class DataService : IDataService
         return weight;
     }
 
-    public async Task<List<Lift>> GetLiftsAsync(int id)
+    public async Task<IEnumerable<Lift>> GetLiftsAsync(int id)
     {
         var user = await _context.Users.FindAsync(id);
         var lifts = user.Lifts;
-        return lifts;
+        return [.. lifts];
     }
 
-    public async Task<Lift> GetLiftByNameAsync(int id, string name)
-    {
-        var user = await _context.Users.FindAsync(id);
-        var lifts = user.Lifts();
-        foreach (Lift l in lifts) {
-            if (l.Name == name) {
-                return l;
-            }
-        }
-        return null;
-    }
-}
+*/
